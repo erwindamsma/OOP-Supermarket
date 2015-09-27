@@ -14,6 +14,8 @@ import java.awt.Graphics;
  */
 public class SupermarketPanel extends javax.swing.JPanel {
 
+    
+    
     /**
      * Creates new form SupermarketPanel
      */
