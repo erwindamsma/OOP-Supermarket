@@ -5,7 +5,6 @@
  */
 package supermarket;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 /**
@@ -14,8 +13,6 @@ import java.awt.Graphics;
  */
 public class SupermarketPanel extends javax.swing.JPanel {
 
-    
-    
     /**
      * Creates new form SupermarketPanel
      */
