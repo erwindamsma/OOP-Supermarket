@@ -5,6 +5,7 @@
  */
 package supersim.persons;
 
+import java.util.Date;
 import java.util.List;
 import supersim.CustomerGroup.CustomerGroup;
 import supersim.Product.ProductWrapper;
@@ -20,6 +21,8 @@ public class Customer extends Person{
     
     CustomerGroup group;
     
+    public boolean hasLeftStore;
+    
     float budget;//Used for buying random extra items;
     
     public Customer(CustomerGroup group)
@@ -27,10 +30,15 @@ public class Customer extends Person{
         this.currentState = State.IDLE;
         
     }
+    
+    public void leaveStore()
+    {
+        this.hasLeftStore = true;
+    }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(Date simulatedDate, float deltatime) {
+        super.update(simulatedDate, deltatime);
         
         //Called every tick, update position and state
         switch(currentState)

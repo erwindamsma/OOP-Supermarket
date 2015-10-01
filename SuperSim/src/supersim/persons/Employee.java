@@ -5,6 +5,7 @@
  */
 package supersim.persons;
 
+import java.util.Date;
 import supersim.Store;
 
 /**
@@ -14,8 +15,7 @@ import supersim.Store;
 public class Employee extends Person{
     
     enum Task {NONE, FILL_SHELF, CASH_REGISTER, FRESH_PRODUCT_COUNTER};
-    
-    
+
     Task currentTask;
     State currentState;
     Store store;
@@ -28,8 +28,8 @@ public class Employee extends Person{
     }
 
     @Override
-    public void update() {
-        super.update(); //Movement is handeled in Person class
+    public void update(Date simulatedDate, float deltatime) {
+        super.update(simulatedDate, deltatime); //Movement is handeled in Person class
         
         //Called every tick, update position and state
         switch(currentState)

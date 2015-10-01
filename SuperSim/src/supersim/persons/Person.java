@@ -6,6 +6,7 @@
 package supersim.persons;
 
 import java.awt.Point;
+import java.util.Date;
 import supersim.StoreObjects.StoreObject;
 
 /**
@@ -22,7 +23,7 @@ public class Person extends StoreObject {
     enum State {IDLE, WALKING, WORKING_TASK};
     State currentState;
     
-    public void update()
+    public void update(Date simulatedDate, float deltatime)
     {
         if(this.location != this.destination)
         {
