@@ -5,10 +5,12 @@
  */
 package supersim.Product;
 
+import java.util.List;
+
 /**
  *
  * @author Jens
  */
 public class ProductStorage {
-    
+    public List<ProductWrapper> storageList;
 }
