@@ -5,12 +5,23 @@
  */
 package supersim.graphics;
 
+import java.awt.Graphics;
 import javax.swing.JPanel;
+import supersim.StoreObjects.StoreObject;
 
-/**
- *
- * @author Jens
- */
 public class StoreRenderer extends JPanel {
-    //Draw JPanel by looking at 
+    private supersim.SuperSim superSim;
+    
+    public StoreRenderer(supersim.SuperSim superSim){
+        this.superSim = superSim;
+    }
+    
+    @Override protected void paintComponent(Graphics g){
+        //super.paintComponent(g);
+        for (StoreObject[] soY : superSim.store.layout.matrix){
+            for (StoreObject soX : soY){
+                soX.onDraw(g, this.getWidth(), this.getHeight());
+            }
+        }
+    }
 }

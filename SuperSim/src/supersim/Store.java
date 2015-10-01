@@ -18,13 +18,13 @@ import java.util.List;
  */
 public class Store{
     
-    SuperSim simulator;
-    StoreController controller;
+    public SuperSim simulator;
+    public StoreController controller;
     
-    ProductStorage storage;
-    List<Customer> customers;
-    List<Employee> employees;
-    StoreLayout    layout;
+    public ProductStorage storage;
+    public List<Customer> customers;
+    public List<Employee> employees;
+    public StoreLayout    layout;
     
 
     public Store(SuperSim simulator)

@@ -27,7 +27,7 @@ public class SuperSim {
     {
         //Initialze components
         timer       = new Timer(startTime);
-        renderer    = new StoreRenderer();
+        renderer    = new StoreRenderer(this);
         store       = new Store(this);
         database    = new DatabaseConnection();
         mainWindow  = new JFrame("SUPERSIM");

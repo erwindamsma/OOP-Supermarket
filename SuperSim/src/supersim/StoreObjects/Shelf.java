@@ -1,14 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package supersim.StoreObjects;
 
-/**
- *
- * @author Jens
- */
+import java.awt.Color;
+import supersim.Product.ProductWrapper;
+
 public class Shelf extends StoreObject{
+    private ProductWrapper product;
+    public Shelf(ProductWrapper product){
+        this.product = product;
+        this.color = Color.RED;
+    }
     
 }

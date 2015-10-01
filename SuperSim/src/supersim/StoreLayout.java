@@ -13,8 +13,10 @@ import supersim.StoreObjects.StoreObject;
  */
 public class StoreLayout {
     
-    Store store;
-    StoreObject[][] matrix;
+    public Store store;
+    public StoreObject[][] matrix;
+    
+    public static final int SIZE = 8;
     
     public StoreLayout(Store s)
     {
