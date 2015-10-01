@@ -1,1 +1,7 @@
 /build/
+SuperSim/database/SuperSim/db.lck
+SuperSim/database/SuperSim/log/log.ctrl
+SuperSim/database/SuperSim/log/logmirror.ctrl
+SuperSim/nbproject/private/private.properties
+SuperSim/nbproject/private/private.xml
+nbproject/private/private.xml
