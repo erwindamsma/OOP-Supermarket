@@ -30,10 +30,12 @@ public class Store{
     public Store(SuperSim simulator)
     {
         this.simulator  = simulator;
-        this.controller = new StoreController(this);
+        this.storage    = new ProductStorage(this);
         this.customers  = new ArrayList<Customer>();
         this.employees  = new ArrayList<Employee>();
         this.layout     = new StoreLayout(this);
+        
+        this.controller = new StoreController(this);
         
     }
    

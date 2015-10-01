@@ -20,7 +20,8 @@ public class StoreRenderer extends JPanel {
         //super.paintComponent(g);
         for (StoreObject[] soY : superSim.store.layout.matrix){
             for (StoreObject soX : soY){
-                soX.onDraw(g, this.getWidth(), this.getHeight());
+                if(soX != null)
+                    soX.onDraw(g, this.getWidth(), this.getHeight());
             }
         }
     }

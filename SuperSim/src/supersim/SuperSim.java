@@ -10,6 +10,7 @@ import supersim.database.DatabaseConnection;
 import supersim.graphics.StoreRenderer;
 import java.util.Date;
 import javax.swing.JFrame;
+import supersim.graphics.MainFrame;
 
 /**
  *
@@ -28,12 +29,16 @@ public class SuperSim {
         //Initialze components
         timer       = new Timer(startTime);
         renderer    = new StoreRenderer(this);
-        store       = new Store(this);
         database    = new DatabaseConnection();
-        mainWindow  = new JFrame("SUPERSIM");
+        
+        store       = new Store(this);
+        
+        mainWindow  = new MainFrame(this);
         
         timer.start();
         timer.speed = 1;
+        
+        mainWindow.setVisible(true);
         
         
     }

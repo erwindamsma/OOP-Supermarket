@@ -6,6 +6,7 @@
 package supersim.Product;
 
 import java.util.List;
+import supersim.Store;
 
 /**
  *
@@ -13,4 +14,9 @@ import java.util.List;
  */
 public class ProductStorage {
     public List<ProductWrapper> storageList;
+    
+    public ProductStorage(Store store)
+    {
+        
+    }
 }

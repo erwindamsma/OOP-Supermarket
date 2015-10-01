@@ -5,8 +5,10 @@
  */
 package supersim;
 
+import java.awt.Point;
 import supersim.timer.ITimeable;
 import java.util.Date;
+import supersim.StoreObjects.Shelf;
 import supersim.StoreObjects.StoreObject;
 import supersim.persons.Employee;
 
@@ -30,7 +32,7 @@ public class StoreController implements ITimeable{
                               {{null,null,null,null,null,null,null,null},
                                {null,null,null,null,null,null,null,null},
                                {null,null,null,null,null,null,null,null},
-                               {null,null,null,null,null,null,null,null},
+                               {null,null,null,new Shelf(store.storage.storageList.get(0), new Point(3,3)),null,null,null,null},
                                {null,null,null,null,null,null,null,null},
                                {null,null,null,null,null,null,null,null}, 
                                {null,null,null,null,null,null,null,null},
@@ -52,6 +54,7 @@ public class StoreController implements ITimeable{
     {
         this.updateCustomers(simulatedDate, deltatime);
         this.updateEmployees(simulatedDate, deltatime);
+        store.simulator.renderer.invalidate();
     }
     
     public void updateCustomers(Date simulatedDate, float deltatime)
