@@ -28,7 +28,7 @@ public class SuperSim {
     {
         //Initialze components
         timer       = new Timer(startTime);
-        renderer    = new StoreRenderer(this);
+        //renderer    = new StoreRenderer(this);
         database    = new DatabaseConnection();
         
         store       = new Store(this);

@@ -20,10 +20,10 @@ public class StoreObject {
     public Color color;
     public Image bitmap;
     public Store store;
-    
+        
     public void onDraw(Graphics g, int panelWidth, int panelHeight){
-        int cellWidth = panelWidth / supersim.StoreLayout.SIZE;
-        int cellHeight = panelHeight / supersim.StoreLayout.SIZE;
+        int cellWidth = panelWidth / store.layout.SIZE;
+        int cellHeight = panelHeight / store.layout.SIZE;
         
         if (bitmap != null){
             g.drawImage(bitmap, cellWidth * location.x, cellHeight * location.y, null);

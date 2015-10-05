@@ -32,6 +32,11 @@ public class Timer {
         //this.interval = interval;
     }
     
+    public Date getSimulatedDate()
+    {
+        return simulatedDate;
+    }
+    
     
     public void start()
     {

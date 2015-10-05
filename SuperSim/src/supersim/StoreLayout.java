@@ -5,6 +5,9 @@
  */
 package supersim;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import supersim.StoreObjects.StoreObject;
 
 /**
@@ -16,7 +19,7 @@ public class StoreLayout {
     public Store store;
     public StoreObject[][] matrix;
     
-    public static final int SIZE = 8;
+    public int SIZE = 8;
     
     public StoreLayout(Store s)
     {
@@ -25,6 +28,14 @@ public class StoreLayout {
     
     public void loadLayoutFromFile(String path)
     {
-        //Fill matrix from file..
+        try 
+        {
+            matrix = LayoutLoader.generateStoreLayout(path, store);
+            SIZE = matrix.length;
+        } 
+        catch (IOException ex)
+        {
+            Logger.getLogger(StoreController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

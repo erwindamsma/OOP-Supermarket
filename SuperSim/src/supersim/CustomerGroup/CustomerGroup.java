@@ -13,6 +13,6 @@ import supersim.Product.ProductWrapper;
  * @author Jens
  */
 public class CustomerGroup {
-    String name;
-    List<ProductWrapper> groceryListPrototype;
+    public String name;
+    public List<ProductWrapper> groceryListPrototype;
 }

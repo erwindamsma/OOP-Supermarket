@@ -16,16 +16,18 @@ import supersim.StoreObjects.StoreObject;
 public class Person extends StoreObject {
     
     public String name;
-    public float speed;
+    public float speed = 1f;
+    
+    public long nextTaskTime = 0;
     
     public Point destination;
     
-    enum State {IDLE, WALKING, WORKING_TASK};
-    State currentState;
+    public enum State {IDLE, WALKING, WORKING_TASK, TAKING_PRODUCT, IN_LINE_CASHREGISTER};
+    public State currentState;
     
     public void update(Date simulatedDate, float deltatime)
     {
-        if(this.location != this.destination)
+        /*if(this.location != this.destination)
         {
             //Moving logic here
             this.currentState = State.WALKING;
@@ -34,7 +36,7 @@ public class Person extends StoreObject {
         else
         {
             this.currentState = State.IDLE;
-        }
+        }*/
     }
     
     public void setDestination(Point dest)

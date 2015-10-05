@@ -38,6 +38,11 @@ public class Store{
         this.controller = new StoreController(this);
         
     }
+    
+    public void addEmployee(Employee e)
+    {
+        employees.add(e);
+    }
    
     
 }
