@@ -28,8 +28,9 @@ public class Employee extends Person{
     //State currentState;
     //Store store;
     
-    public Employee(Store s, Point location)
+    public Employee(String name, Store s, Point location)
     {
+        this.name = name;
         this.store = s;
         this.currentState = State.IDLE;
         this.currentTask = Task.NONE;
@@ -166,21 +167,24 @@ public class Employee extends Person{
                     switch(currentTask)
                     {
                         case FILL_SHELF:
-                            this.nextTaskTime = (long) (simulatedDate.getTime() + ((10 * 1000) / this.speed));//Takes 10 seconds to fill a shelf.
+                            this.nextTaskTime = (long) (simulatedDate.getTime() + ((120 * 1000) / this.speed));//Takes 120 seconds to fill a shelf.
                             currentShelf =  this.moveToEmptyShelf();
                             
                             if(currentShelf != null)
                             {
+                                System.out.println(this.name + " is filling " + currentShelf + " with dept: " + currentShelf.department);
                                 currentShelf.beingFilled = true;
                                 fillShelf(currentShelf);
                             }
                             else{
                                 if(cashRegisterWithShortestLine().getNrCustomers() > 3) //When there is a cashregister with more than 3 people in line, man an empty cashregister 
                                 {
+                                    
                                     CashRegister cr = findUnmanedCashRegister();
                                     
                                     if(cr != null)
                                     {
+                                        System.out.println(this.name + " has manned CashRegister: " + cr);
                                         cr.employee = this;
                                         this.currentCashRegister = cr;
                                         this.location = cr.location;
@@ -191,9 +195,10 @@ public class Employee extends Person{
                             break;
                             
                         case CASH_REGISTER:
-                            this.nextTaskTime = (long) (simulatedDate.getTime() + ((10 * 1000) / this.speed));//Takes 10 seconds to help a customer
+                            this.nextTaskTime = (long) (simulatedDate.getTime() + ((40 * 1000) / this.speed));//Takes 10 seconds to help a customer
                             if(this.currentCashRegister.getNrCustomers() == 0 && nrOfMannedCashRegisters() > 1)//When the line is empty and there are other manned chashregisters, leave this cashregister.
                             {
+                                System.out.println(this.name + " has left CashRegister: " + currentCashRegister);
                                 this.currentCashRegister.employee = null;
                                 this.currentCashRegister = null;
                                 this.currentTask = Task.FILL_SHELF;
@@ -201,6 +206,7 @@ public class Employee extends Person{
                             else
                             if(this.currentCashRegister.getNrCustomers() > 0)
                             {
+                                System.out.println(this.name + " is helping the next customer in line (" + this.currentCashRegister.getNrCustomers() + " people in line)");
                                 this.currentCashRegister.CheckTask(simulatedDate);
                             }
                             break;

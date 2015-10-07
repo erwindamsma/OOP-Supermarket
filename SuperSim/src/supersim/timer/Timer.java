@@ -102,7 +102,7 @@ public class Timer {
             //Debugging
             if(culdelta > 1000)
             {
-                System.out.println("New time: "+simulatedDate.toString());
+                //System.out.println("New time: "+simulatedDate.toString());
                 culdelta = 0;
             }
             culdelta += deltaTime;

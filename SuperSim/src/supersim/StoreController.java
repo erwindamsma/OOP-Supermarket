@@ -8,6 +8,7 @@ package supersim;
 import java.awt.Point;
 import supersim.timer.ITimeable;
 import java.util.Date;
+import java.util.Random;
 import supersim.CustomerGroup.CustomerGroup;
 import supersim.CustomerGroup.CustomerGroupLibrary;
 import supersim.persons.Customer;
@@ -21,6 +22,9 @@ import supersim.persons.Person;
 public class StoreController implements ITimeable{
 
     Store store;
+    
+    //Debug
+    Random rnd = new Random();
     
     public StoreController(Store store)
     {
@@ -45,24 +49,24 @@ public class StoreController implements ITimeable{
     
         
         //add employees DEBUG
-        store.employees.add(new Employee(store, new Point(0,0)));
-        store.employees.add(new Employee(store,new Point(1,0)));
-        store.employees.add(new Employee(store,new Point(2,0)));
+        store.employees.add(new Employee("Employee 1", store, new Point(0,0)));
+        //store.employees.add(new Employee("Employee 2", store,new Point(1,0)));
+        store.employees.add(new Employee("Employee 3", store,new Point(2,0)));
         
         store.employees.get(0).currentTask = Employee.Task.FILL_SHELF;
         store.employees.get(0).currentState = Person.State.WORKING_TASK;
         store.employees.get(0).speed = 1f;
         
-        store.employees.get(1).currentTask = Employee.Task.FILL_SHELF;
-        store.employees.get(1).currentState = Person.State.WORKING_TASK;
-        store.employees.get(1).speed = 2.7f;
+        //store.employees.get(1).currentTask = Employee.Task.FILL_SHELF;
+        //store.employees.get(1).currentState = Person.State.WORKING_TASK;
+        //store.employees.get(1).speed = 1.1f;
         
-        store.employees.get(2).currentTask = Employee.Task.CASH_REGISTER;
-        store.employees.get(2).currentState = Person.State.WORKING_TASK;
-        store.employees.get(2).currentCashRegister = store.employees.get(2).findUnmanedCashRegister();
-        store.employees.get(2).currentCashRegister.employee = store.employees.get(2);
-        store.employees.get(2).location = store.employees.get(2).currentCashRegister.location;
-        store.employees.get(2).speed = 1.7f;
+        store.employees.get(1).currentTask = Employee.Task.CASH_REGISTER;
+        store.employees.get(1).currentState = Person.State.WORKING_TASK;
+        store.employees.get(1).currentCashRegister = store.employees.get(1).findUnmanedCashRegister();
+        store.employees.get(1).currentCashRegister.employee = store.employees.get(1);
+        store.employees.get(1).location = store.employees.get(1).currentCashRegister.location;
+        store.employees.get(1).speed = 0.7f;
         
         store.simulator.timer.addSubscriber(this); //Subscribe to the timer
         
@@ -81,10 +85,10 @@ public class StoreController implements ITimeable{
     public void updateCustomers(Date simulatedDate, float deltatime)
     {
         //Check if new customers should enter the store..
-        if(store.customers.size() < 3)
+        if(store.customers.size() < 1)
         {
             CustomerGroup cg = CustomerGroupLibrary.getRandomCustomerGroup();
-            Customer c = new Customer(cg, store);
+            Customer c = new Customer("Customer " + rnd.nextInt(10),cg, store);
             c.location = new Point(10,19);
             
             store.customers.add(c);

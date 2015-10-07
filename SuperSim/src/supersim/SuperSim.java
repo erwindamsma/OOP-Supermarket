@@ -36,7 +36,7 @@ public class SuperSim {
         mainWindow  = new MainFrame(this);
         
         timer.start();
-        timer.speed = 1;
+        timer.speed = 10;
         
         mainWindow.setVisible(true);
         

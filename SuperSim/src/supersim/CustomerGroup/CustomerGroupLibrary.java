@@ -25,9 +25,15 @@ public class CustomerGroupLibrary {
             pw.product.id = 1;
             pw.product.name = "test";
             pw.product.price = 12.5f;
-            pw.amount = 5;
+            pw.amount = 1;
             
             debugGroup.groceryListPrototype.add(pw);
+            pw.product = new Product();
+            pw.product.id = 2;
+            pw.product.name = "Koffie";
+            pw.product.price = 3.5f;
+            pw.amount = 1;
+            
             debugGroup.groceryListPrototype.add(pw);        
             
             groups.add(debugGroup);

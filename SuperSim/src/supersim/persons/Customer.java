@@ -34,10 +34,11 @@ public class Customer extends Person{
     
     public Shelf currentShelf;
     
-    public Customer(CustomerGroup group, Store store)
+    public Customer(String name, CustomerGroup group, Store store)
     {
         this.currentState = State.IDLE;
         this.group = group;
+        this.name = name;
         
         this.groceryList = new ArrayList<ProductWrapper>(group.groceryListPrototype); //Copy the prototype
         this.shoppingCart = new ArrayList<ProductWrapper>();
@@ -124,9 +125,11 @@ public class Customer extends Person{
             {
                 //When in the IDLE state choose a thing to do next..
                 case IDLE:
-                    nextTaskTime = (long) (simulatedDate.getTime() + ((30 * 1000) / this.speed)); // Takes 30 seconds to look for a shelf
+                    nextTaskTime = (long) (simulatedDate.getTime() + ((40 * 1000) / this.speed)); // Takes 40 seconds to look for a shelf
+                    
                     if(this.groceryList.size() > 0)
                     {
+                        System.out.println(this.name + " is looking for " + this.groceryList.get(0).product.name);
                         //Get the next item on the grocery list
                         currentShelf = moveToShelf(this.groceryList.get(0));
                         if(currentShelf != null)
@@ -140,6 +143,7 @@ public class Customer extends Person{
                     }
                     else
                     {
+                      System.out.println(this.name + " is Moving to the cashregister");  
                       //All products on the grocerylist are in the shoppingcart
                       CashRegister register = moveToCashRegister();
                       register.addCustomerToLine(this);
@@ -148,9 +152,10 @@ public class Customer extends Person{
                     break;
 
                 case TAKING_PRODUCT:
-                        nextTaskTime = (long) (simulatedDate.getTime() + ((10 * 1000) / this.speed)); //takes 10 seconds to take an item..
+                        nextTaskTime = (long) (simulatedDate.getTime() + ((20 * 1000) / this.speed)); //takes 20 seconds to take an item..
                         if(this.groceryList.size() > 0 && currentShelf.takeItem(this.groceryList.get(0).amount))
                         {
+                            System.out.println(this.name + " is taking " + this.groceryList.get(0).product.name + " from a shelf");
                             this.shoppingCart.add(this.groceryList.get(0));
                             this.groceryList.remove(0);
                             this.currentState = State.IDLE;

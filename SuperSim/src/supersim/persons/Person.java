@@ -5,6 +5,8 @@
  */
 package supersim.persons;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Date;
 import supersim.StoreObjects.StoreObject;
@@ -24,6 +26,17 @@ public class Person extends StoreObject {
     
     public enum State {IDLE, WALKING, WORKING_TASK, TAKING_PRODUCT, IN_LINE_CASHREGISTER};
     public State currentState;
+    
+    @Override
+    public void onDraw(Graphics g, int panelWidth, int panelHeight)
+    {
+        super.onDraw(g, panelWidth, panelHeight);
+        int cellWidth = panelWidth / store.layout.SIZE;
+        int cellHeight = panelHeight / store.layout.SIZE;
+        g.setColor(Color.BLACK);
+        g.drawString(this.name, this.location.x * cellWidth, this.location.y * cellHeight+ 20);
+        
+    }
     
     public void update(Date simulatedDate, float deltatime)
     {
