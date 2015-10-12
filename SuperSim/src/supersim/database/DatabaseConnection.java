@@ -25,14 +25,10 @@ public class DatabaseConnection {
     
     Connection conn;
     
-    public DatabaseConnection()
+    public DatabaseConnection() throws SQLException
     {
-        try {
             this.connect();
             getStorage();
-        } catch (SQLException ex) {
-            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     public void addProduct(String name, float price)
@@ -92,6 +88,8 @@ public class DatabaseConnection {
                 p.id    = r.getInt("ID");
                 p.name  = r.getString("NAME");
                 p.price = r.getFloat("PRICE");
+                p.department  = r.getString("DEPARTMENT");
+                p.isFresh  = r.getBoolean("ISFRESH");
                 
                 retval = p;
             }

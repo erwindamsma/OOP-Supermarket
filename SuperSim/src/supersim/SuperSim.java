@@ -5,12 +5,13 @@
  */
 package supersim;
 
+import java.sql.SQLException;
 import supersim.timer.Timer;
 import supersim.database.DatabaseConnection;
 import supersim.graphics.StoreRenderer;
 import java.util.Date;
-import javax.swing.JFrame;
 import supersim.graphics.MainFrame;
+import supersim.graphics.MainWindow;
 
 /**
  *
@@ -22,9 +23,9 @@ public class SuperSim {
     public StoreRenderer renderer;
     public Store store;
     public DatabaseConnection database;
-    public JFrame mainWindow;
+    public MainWindow mainWindow;
     
-    public SuperSim(Date startTime)
+    public SuperSim(Date startTime) throws SQLException
     {
         //Initialze components
         timer       = new Timer(startTime);
@@ -33,14 +34,15 @@ public class SuperSim {
         
         store       = new Store(this);
         
-        mainWindow  = new MainFrame(this);
+        mainWindow  = new MainWindow(this);
+        
+        
         
         timer.start();
-        timer.speed = 10;
+        timer.speed = 1;
         
         mainWindow.setVisible(true);
-        
-        
+
     }
     
 }

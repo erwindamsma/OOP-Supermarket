@@ -41,14 +41,19 @@ public class CashRegister extends TaskStation{
     @Override
     public void doTask(Date virtualDate)
     {
+        super.doTask(virtualDate);
+        
         if(currentCostumer != null)
-        for(ProductWrapper pw : currentCostumer.shoppingCart)
         {
-            content += pw.amount * pw.product.price;
+            for(ProductWrapper pw : currentCostumer.shoppingCart)
+            {
+                content += pw.amount * pw.product.price;
+            }
+
+
+            currentCostumer.shoppingCart.clear();
+            currentCostumer.leaveStore();//Tell the customer to leave the store..
+            currentCostumer = null;
         }
-        
-        
-        currentCostumer.shoppingCart.clear();
-        currentCostumer.leaveStore();
     }
 }

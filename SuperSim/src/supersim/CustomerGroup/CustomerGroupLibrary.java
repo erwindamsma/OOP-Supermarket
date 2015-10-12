@@ -4,43 +4,102 @@ import java.util.ArrayList;
 import java.util.Random;
 import supersim.Product.Product;
 import supersim.Product.ProductWrapper;
+import supersim.Store;
 
 public class CustomerGroupLibrary {
     
     private static ArrayList<CustomerGroup> groups;
     private static Random rnd = new Random();
     
-    public static void initLib()
+    Store store;
+    
+    public CustomerGroupLibrary(Store store)
+    {
+        this.store = store;
+    }
+    
+    public void initLib()
     {
         if(groups == null)
         {
             groups = new ArrayList<CustomerGroup>();
             
-            //The Debug group
-            CustomerGroup debugGroup = new CustomerGroup();
-            debugGroup.name = "DEBUG CUSTOMER";
-            debugGroup.groceryListPrototype = new ArrayList<ProductWrapper>();
-            ProductWrapper pw = new ProductWrapper();
-            pw.product = new Product();
-            pw.product.id = 1;
-            pw.product.name = "test";
-            pw.product.price = 12.5f;
+            ProductWrapper pw = null;//Used in singleton
+            CustomerGroup cGroup = null;//Used in singleton
+            
+            //The Student group
+            cGroup = new CustomerGroup();
+            cGroup.name = "Student";
+            cGroup.groceryListPrototype = new ArrayList<ProductWrapper>();
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductTypeInStore("Diepvries");
             pw.amount = 1;
-            
-            debugGroup.groceryListPrototype.add(pw);
-            pw.product = new Product();
-            pw.product.id = 2;
-            pw.product.name = "Koffie";
-            pw.product.price = 3.5f;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductTypeInStore("Diepvries");
             pw.amount = 1;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductTypeInStore("Drank");
+            pw.amount = 1;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductType("Bakkerij");
+            pw.amount = 1;
+            cGroup.groceryListPrototype.add(pw);
+            groups.add(cGroup);
             
-            debugGroup.groceryListPrototype.add(pw);        
+            //The Housemom group
+            cGroup = new CustomerGroup();
+            cGroup.name = "House mom 1";
+            cGroup.groceryListPrototype = new ArrayList<ProductWrapper>();
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductType("Vlees");
+            pw.amount = 2;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductTypeInStore("Groente");
+            pw.amount = 2;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductType("Kaas");
+            pw.amount = 1;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductTypeInStore("Zuivel");
+            pw.amount = 1;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductType("Bakkerij");
+            pw.amount = 1;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductType("Bakkerij");
+            pw.amount = 1;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductType("Fruit");
+            pw.amount = 2;
+            cGroup.groceryListPrototype.add(pw);
+            groups.add(cGroup);
             
-            groups.add(debugGroup);
+            //The dude group
+            cGroup = new CustomerGroup();
+            cGroup.name = "Dude";
+            cGroup.groceryListPrototype = new ArrayList<ProductWrapper>();
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductTypeInStore("Drank");
+            pw.amount = 2;
+            cGroup.groceryListPrototype.add(pw);
+            pw = new ProductWrapper();
+            pw.product = store.storage.getRandomProductTypeInStore("Drank");
+            pw.amount = 2;
+            cGroup.groceryListPrototype.add(pw);
+            groups.add(cGroup);
         }
     }
     
-    public static CustomerGroup getRandomCustomerGroup()
+    public CustomerGroup getRandomCustomerGroup()
     {
         initLib();
         if(groups == null || groups.size() <= 0) return null;

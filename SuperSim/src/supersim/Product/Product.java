@@ -13,4 +13,15 @@ public class Product {
     public int id;
     public String name;
     public float price;
+    public String department;
+    public boolean isFresh;
+    
+    public Product()
+    {
+        this.id         = 0;
+        this.name       = "";
+        this.price      = 0f;
+        this.department = "";
+        this.isFresh    = false;
+    }
 }

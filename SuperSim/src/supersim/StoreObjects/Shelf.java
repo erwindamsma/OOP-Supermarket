@@ -1,6 +1,7 @@
 package supersim.StoreObjects;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 import supersim.Product.Product;
 import supersim.Product.ProductWrapper;
@@ -35,15 +36,19 @@ public class Shelf extends StoreObject{
         this.SIZE = 10;
         this.store = store;
         
-        ProductWrapper pw = new ProductWrapper();
-            pw.amount = 0;
-            pw.product = store.storage.getRandomProductType();
-            
-            this.product = pw;
+        
         
         if(arguments.length > 1)
         {
             this.department = arguments[1];
+            
+            ProductWrapper pw = new ProductWrapper();
+            pw.amount = 0;
+            pw.product = store.storage.getProductTypeNotInStore(this.department);
+            
+            if(pw.product == null) pw.product = store.storage.getRandomProductType(this.department);
+            
+            this.product = pw;
             
         }
             
@@ -80,6 +85,17 @@ public class Shelf extends StoreObject{
         }
 
         return false;
+    }
+    
+    @Override
+    public void onDraw(Graphics g, int panelWidth, int panelHeight)
+    {
+        super.onDraw(g, panelWidth, panelHeight);
+        int cellWidth = panelWidth / store.layout.SIZE;
+        int cellHeight = panelHeight / store.layout.SIZE;
+        g.setColor(Color.BLACK);
+        g.drawString(this.product.product.name + " ("+this.product.amount+"/"+this.SIZE+")", this.location.x * cellWidth + cellWidth, this.location.y * cellHeight+ 20);
+        
     }
     
 }

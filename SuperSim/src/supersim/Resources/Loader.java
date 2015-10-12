@@ -3,12 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package supersim.Product;
+package supersim.Resources;
+
+import java.io.InputStream;
 
 /**
  *
  * @author Jens
  */
-public class ProductDepartment {
-    
+public class Loader {
+    public static InputStream getResource(String path)
+    {
+        return Loader.class.getResourceAsStream(path);
+    }
 }

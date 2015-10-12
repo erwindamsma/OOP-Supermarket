@@ -13,6 +13,7 @@ import supersim.Store;
 import supersim.StoreObjects.CashRegister;
 import supersim.StoreObjects.Shelf;
 import supersim.StoreObjects.StoreObject;
+import supersim.StoreObjects.TaskStation;
 
 /**
  *
@@ -20,7 +21,7 @@ import supersim.StoreObjects.StoreObject;
  */
 public class Employee extends Person{
     
-    public enum Task {NONE, FILL_SHELF, CASH_REGISTER, FRESH_PRODUCT_COUNTER};
+    public enum Task {NONE, FILL_SHELF, TASK_STATION, HELPING_CUSTOMER};
 
     public Task currentTask;
     
@@ -38,27 +39,37 @@ public class Employee extends Person{
         this.location = location;
     }
     
-    public Shelf moveToEmptyShelf()
+    
+    //Find empty shelf where products are still in storage.
+    public Shelf findEmptyShelf()
     {
+        Shelf bestShelf = null;
+        
         for(StoreObject[] soY : store.layout.matrix)
         {
             for(StoreObject soX : soY)
             {
-                if(soX != null && soX.getClass() == Shelf.class)
+                if(soX != null && soX instanceof Shelf)
                 {
                     Shelf s = (Shelf)soX;
                     int itemsinshelf = s.getAmountOfItemsInShelf();
-                    if(itemsinshelf < s.SIZE && !s.beingFilled)
+                    if(itemsinshelf < s.SIZE && store.storage.amountInStorage(s.getProduct()) != 0 && !s.beingFilled)
                     {
-                        this.location = s.location;
-                        return s;
+                        if(bestShelf == null) bestShelf = s;
+                        else
+                        {
+                            if(this.distance(bestShelf) > this.distance(s))
+                            {
+                                bestShelf = s;
+                            }
+                        }
                     }
                         
                 }
             }
         }
         
-        return null;
+        return bestShelf;
     }
     
     public void fillShelf(Shelf shelf)
@@ -67,7 +78,7 @@ public class Employee extends Person{
        if(store.storage.amountInStorage(shelf.getProduct()) != 0)
        {
            ProductWrapper pw = new ProductWrapper();
-           pw.amount = shelf.SIZE;
+           pw.amount = shelf.SIZE - shelf.getAmountOfItemsInShelf();
            pw.product = shelf.getProduct();
 
            int itemsTaken = store.storage.TakeFromStorage(pw);
@@ -75,24 +86,28 @@ public class Employee extends Person{
        }
     }
     
-    
-    public CashRegister cashRegisterWithShortestLine()
+    public TaskStation unmannedTaskStationWithLine()
     {
-        int lowestLineSize = Integer.MAX_VALUE;
-        CashRegister retVal = null;
+        TaskStation bestTs = null;
         
-         for(StoreObject[] soY : store.layout.matrix)
+        for(StoreObject[] soY : store.layout.matrix)
         {
             for(StoreObject soX : soY)
             {
-                if(soX != null && soX.getClass() == CashRegister.class)
+                if(soX != null && soX instanceof TaskStation)
                 {
-                    CashRegister cr = (CashRegister)soX;
+                    TaskStation ts = (TaskStation)soX;
                     
-                    if(cr.employee != null && cr.getNrCustomers() < lowestLineSize)
+                    if(ts.employee == null && ts.getNrCustomers() > 0)
                     {
-                        lowestLineSize = cr.getNrCustomers();
-                        retVal = cr;
+                       if(bestTs == null) bestTs = ts;
+                       else
+                       {
+                           if(this.distance(bestTs) > this.distance(ts))
+                           {
+                               bestTs = ts;
+                           }
+                       }
                         
                     }
                         
@@ -100,32 +115,42 @@ public class Employee extends Person{
             }
         }
          
-         return retVal;
+         return bestTs;
     }
     
-    public CashRegister findUnmanedCashRegister()
+    
+    public TaskStation findUnmanedTaskStationWithLine()
     {
+        TaskStation bestTs = null;
+        
         for(StoreObject[] soY : store.layout.matrix)
         {
             for(StoreObject soX : soY)
             {
-                if(soX != null && soX.getClass() == CashRegister.class)
+                if(soX != null && soX instanceof TaskStation)
                 {
-                    CashRegister cr = (CashRegister)soX;
+                    TaskStation ts = (TaskStation)soX;
                     
-                    if(cr.employee == null)
+                    if(ts.employee == null && ts.getNrCustomers() > 0)
                     {
-                        return cr;
+                        if(bestTs == null) bestTs = ts;
+                       else
+                       {
+                           if(this.distance(bestTs) > this.distance(ts))
+                           {
+                               bestTs = ts;
+                           }
+                       }
                     }
                         
                 }
             }
         }
         
-        return null;
+        return bestTs;
     }
     
-    public int nrOfMannedCashRegisters()
+    public int nrOfMannedTaskStations()
     {
         int retval = 0;
         
@@ -133,11 +158,11 @@ public class Employee extends Person{
         {
             for(StoreObject soX : soY)
             {
-                if(soX != null && soX.getClass() == CashRegister.class)
+                if(soX != null && soX instanceof TaskStation)
                 {
-                    CashRegister cr = (CashRegister)soX;
+                    TaskStation ts = (TaskStation)soX;
                     
-                    if(cr.employee != null)
+                    if(ts.employee != null)
                     {
                         retval++;
                     }
@@ -149,72 +174,111 @@ public class Employee extends Person{
         return retval;
     }
 
-    public Shelf currentShelf;
-    public CashRegister currentCashRegister;
+    public Shelf assignedShelf;
+    public TaskStation currentTaskStation;
     @Override
     public void update(Date simulatedDate, float deltatime) {
         super.update(simulatedDate, deltatime); //Movement is handeled in Person class
+        long cTime = simulatedDate.getTime();
         
-        
-        
-        //Called every tick, update position and state
-        switch(currentState)
-        {
-            case WORKING_TASK:
-                if(simulatedDate.getTime() > nextTaskTime)//Check if its time to take a new task.
+       
+                if(cTime > nextStateUpdateTime)//Check if its time to advance the state.
                 {
-                    if(currentShelf != null) currentShelf.beingFilled = false;
                     switch(currentTask)
                     {
+                        case NONE://Find this employee something to do
+                            this.location = new Point(10,10);
+                            //When there is an empty taskstation with more than 1 people in line, man an unmanned taskstation.
+                            //Check this first because it has a high priority
+                            TaskStation ts = findUnmanedTaskStationWithLine();
+                            if(ts != null) //If such a taskstation has been found
+                            {
+                                manTaskStation(ts); //Assign the employee to the taskstation
+                                this.currentTask = Task.TASK_STATION;
+                                nextStateUpdateTime = cTime + (long)(this.distance(ts) * 1000); //it takes 1 second per unit of distance to walk to the task station.
+                                return;
+                            }
+
+                            this.currentTask = Task.FILL_SHELF;//try to fill a shelf
+   
+                            return;
+
                         case FILL_SHELF:
-                            this.nextTaskTime = (long) (simulatedDate.getTime() + ((120 * 1000) / this.speed));//Takes 120 seconds to fill a shelf.
-                            currentShelf =  this.moveToEmptyShelf();
+                            if(assignedShelf != null){//If a shelf has been assigned to fill
+                                fillShelf(assignedShelf);
+                                assignedShelf.beingFilled = false;
+                                this.assignedShelf = null;
+                                
+                                this.currentTask = Task.NONE; // find something to do
+                                return;
+                            }
                             
-                            if(currentShelf != null)
+                            assignedShelf =  this.findEmptyShelf(); //Find shelf to fill
+                            if(assignedShelf != null)//If an empty shelf has been found
                             {
-                                System.out.println(this.name + " is filling " + currentShelf + " with dept: " + currentShelf.department);
-                                currentShelf.beingFilled = true;
-                                fillShelf(currentShelf);
+                                this.location = assignedShelf.location; //Move to the location of the shelf
+                                assignedShelf.beingFilled = true; //Keep other employees from filling this shelf.
+                                
+                                //TODO: make this call shorter
+                                store.simulator.mainWindow.logMessage(this.name + " is filling " + assignedShelf + " with dept: " + assignedShelf.department);
                             }
-                            else{
-                                if(cashRegisterWithShortestLine().getNrCustomers() > 3) //When there is a cashregister with more than 3 people in line, man an empty cashregister 
-                                {
-                                    
-                                    CashRegister cr = findUnmanedCashRegister();
-                                    
-                                    if(cr != null)
-                                    {
-                                        System.out.println(this.name + " has manned CashRegister: " + cr);
-                                        cr.employee = this;
-                                        this.currentCashRegister = cr;
-                                        this.location = cr.location;
-                                        this.currentTask = Task.CASH_REGISTER;
-                                    }
-                                }
+                            else{//No shelf found, find another task.
+                                this.currentTask = Task.NONE;
+                                this.nextStateUpdateTime =  (cTime + (long)((10 * 1000) / this.speed));//Takes 10 seconds to find a new task.
+                                return;
                             }
-                            break;
                             
-                        case CASH_REGISTER:
-                            this.nextTaskTime = (long) (simulatedDate.getTime() + ((40 * 1000) / this.speed));//Takes 10 seconds to help a customer
-                            if(this.currentCashRegister.getNrCustomers() == 0 && nrOfMannedCashRegisters() > 1)//When the line is empty and there are other manned chashregisters, leave this cashregister.
+                            this.nextStateUpdateTime =  (cTime + (long)((60 * 1000) / this.speed));//Takes 60 seconds to fill a shelf at speed = 1.
+                            return;
+                            
+                        case TASK_STATION:
+                            this.location = currentTaskStation.location;
+                            
+                            if(this.currentTaskStation.getNrCustomers() == 0) //If no people are in the line find another task
                             {
-                                System.out.println(this.name + " has left CashRegister: " + currentCashRegister);
-                                this.currentCashRegister.employee = null;
-                                this.currentCashRegister = null;
-                                this.currentTask = Task.FILL_SHELF;
+                                this.leaveTaskStation();
+                                this.currentTask = Task.NONE;
+                                return;
                             }
-                            else
-                            if(this.currentCashRegister.getNrCustomers() > 0)
+                            else 
                             {
-                                System.out.println(this.name + " is helping the next customer in line (" + this.currentCashRegister.getNrCustomers() + " people in line)");
-                                this.currentCashRegister.CheckTask(simulatedDate);
+                                this.store.simulator.mainWindow.logMessage(this.name + " is helping the next customer in line (" + this.currentTaskStation.getNrCustomers() + " people in line)");
+                                this.currentTask = Task.HELPING_CUSTOMER;
                             }
-                            break;
+                            
+                           
+                            this.nextStateUpdateTime = (cTime + (long)((this.currentTaskStation.taskTime / this.speed) * 1000));//Takes 'taskTime' seconds to help a customer
+                            return;
+                            
+                        case HELPING_CUSTOMER:
+                            this.currentTaskStation.CheckTask(simulatedDate); //Help the next customer in line
+                            this.currentTask = Task.TASK_STATION;
+                            return;
                     }
                 }
-                
-                
-                break;
+        
+    }
+    
+    public void leaveTaskStation()
+    {
+        if(currentTaskStation != null)
+        {
+            this.store.simulator.mainWindow.logMessage(this.name + " has left taskStation: " + currentTaskStation);
+            this.currentTaskStation.employee = null;
+            this.currentTaskStation = null;
+        }
+    }
+    
+    public void manTaskStation(TaskStation ts)
+    {
+        if(ts.employee == null)
+        {
+            if(this.currentTaskStation != null) leaveTaskStation();
+            
+            this.store.simulator.mainWindow.logMessage(this.name + " has manned TaskStation: " + ts);
+            ts.employee = this;
+            this.currentTaskStation = ts;
+            //this.location = ts.location;
         }
     }
     

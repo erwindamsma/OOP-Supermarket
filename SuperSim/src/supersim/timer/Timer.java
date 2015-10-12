@@ -29,6 +29,7 @@ public class Timer {
         timerThread = new TimerThread(this);
         
         simulatedDate = startDate;
+        
         //this.interval = interval;
     }
     
@@ -83,6 +84,7 @@ public class Timer {
             while(shouldRun)
             {
                 tick();
+                
             }
         } 
         
@@ -93,8 +95,10 @@ public class Timer {
             long now = new Date().getTime();
             float deltaTime = now - lastTickTime;
             lastTickTime = now;
+            
+            long passedTime = (long) (deltaTime * speed);
 
-            simulatedDate.setTime((long)(simulatedDate.getTime() + (deltaTime * speed)));
+            simulatedDate.setTime((simulatedDate.getTime() + passedTime));
 
             //We make a copy so the list wont be altered while we loop over it.
             ArrayList<ITimeable> subscopy = (ArrayList<ITimeable>)subscribers.clone();

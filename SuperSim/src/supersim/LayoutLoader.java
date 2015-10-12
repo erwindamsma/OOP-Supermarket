@@ -7,10 +7,10 @@ package supersim;
 
 import java.awt.Point;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.InputStreamReader;
+import supersim.Resources.Loader;
 import supersim.StoreObjects.CashRegister;
+import supersim.StoreObjects.FreshProductCounter;
 import supersim.StoreObjects.Shelf;
 import supersim.StoreObjects.StoreObject;
 
@@ -21,13 +21,13 @@ import supersim.StoreObjects.StoreObject;
 public class LayoutLoader {
     
     
-    public static StoreObject[][] generateStoreLayout(String filepath, Store store) throws FileNotFoundException, IOException
+    public static StoreLayout generateStoreLayout(String filepath, Store store) throws Exception
     {
         //Generate the map of storeobjects
         //StoreObjectLibrary.createLibrary();
         
         int matrixSize = -1;//Will be read from the file..
-        BufferedReader br = new BufferedReader(new FileReader(filepath));  
+        BufferedReader br = new BufferedReader(new InputStreamReader(Loader.getResource(filepath), "UTF-8"));//new FileReader(filepath));  
         String line = null;  
         
         //Read the size of the matrix from the first line of the map file
@@ -37,6 +37,7 @@ public class LayoutLoader {
         
         if(matrixSize == -1) return null;
             
+        StoreLayout retVal = new StoreLayout(store);
         StoreObject[][] matrix = new StoreObject[matrixSize][matrixSize];
         
         int x = 0, y = 0;
@@ -66,6 +67,16 @@ public class LayoutLoader {
                         matrix[y][x] = newCashRegister;
                         break;
                         
+                    case "freshproductcounter":
+                        FreshProductCounter newFreshProductCounter = new FreshProductCounter(args, store);
+                        newFreshProductCounter.location = new Point(x,y);
+                        matrix[y][x] = newFreshProductCounter;
+                        break;
+                        
+                    case "entrance":
+                        retVal.entrance = new Point(x,y);
+                        break;
+                        
                 }
                 
                 x++;
@@ -74,6 +85,8 @@ public class LayoutLoader {
             y++;
         } 
         
-        return matrix;
+        retVal.matrix = matrix;
+        retVal.SIZE   = matrixSize;
+        return retVal;
     }
 }

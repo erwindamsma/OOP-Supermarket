@@ -26,6 +26,8 @@ public class Store{
     public List<Employee> employees;
     public StoreLayout    layout;
     
+    public int openingHour = 8;
+    public int closingHour = 20;
 
     public Store(SuperSim simulator)
     {
@@ -39,6 +41,7 @@ public class Store{
         
     }
     
+ 
     public void addEmployee(Employee e)
     {
         employees.add(e);

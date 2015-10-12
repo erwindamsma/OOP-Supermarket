@@ -6,7 +6,6 @@
 package supersim.persons;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +13,7 @@ import supersim.CustomerGroup.CustomerGroup;
 import supersim.Product.ProductWrapper;
 import supersim.Store;
 import supersim.StoreObjects.CashRegister;
+import supersim.StoreObjects.FreshProductCounter;
 import supersim.StoreObjects.Shelf;
 import supersim.StoreObjects.StoreObject;
 
@@ -26,7 +26,7 @@ public class Customer extends Person{
     public List<ProductWrapper> shoppingCart;
     public List<ProductWrapper> groceryList;
     
-    CustomerGroup group;
+    public CustomerGroup group;
     
     public boolean hasLeftStore;
     
@@ -54,21 +54,28 @@ public class Customer extends Person{
         this.hasLeftStore = true;
     }
     
-    public Shelf moveToShelf(ProductWrapper productwrapper)
+    public Shelf findShelfContainingProduct(ProductWrapper productwrapper)
     {
         int x = 0, y = 0;
+        
+        Shelf bestShelf = null;
+        
         for(StoreObject[] soY : store.layout.matrix)
         {
             for(StoreObject soX : soY)
             {
                 
-                if(soX != null && soX.getClass() == Shelf.class)
+                if(soX != null && soX instanceof Shelf)
                 {
                     Shelf s = (Shelf)soX;
+
                     if(s.getAmountOfItemsInShelf() > 0 && s.getProduct().id == productwrapper.product.id)
                     {
-                        this.location = s.location;
-                        return s;
+                        if(bestShelf == null) bestShelf = s;
+                        else
+                        {
+                            if(this.distance(bestShelf) > this.distance(s)) bestShelf = s;
+                        }
                     }
                 }
                 x++;
@@ -77,10 +84,54 @@ public class Customer extends Person{
             y++;
         }
         
-        return null;
+        return bestShelf;
     }
     
-    public CashRegister moveToCashRegister()
+    public FreshProductCounter findFreshProductCounterContainingProduct(ProductWrapper productwrapper)
+    {
+        
+        FreshProductCounter bestFreshProductCounter = null;
+        
+        int x = 0, y = 0;
+        for(StoreObject[] soY : store.layout.matrix)
+        {
+            for(StoreObject soX : soY)
+            {
+                
+                if(soX != null && soX instanceof FreshProductCounter)
+                {
+                    FreshProductCounter fpc = (FreshProductCounter)soX;
+                    if(productwrapper.product.department.equalsIgnoreCase(fpc.department))
+                    {
+                        if(bestFreshProductCounter == null) bestFreshProductCounter = fpc;
+                        else
+                        {
+                            //if(bestCashRegister.employee != null)
+                            
+                            
+                                if(bestFreshProductCounter.getNrCustomers() == fpc.getNrCustomers())
+                                {
+                                    if(this.distance(bestFreshProductCounter) > this.distance(fpc))
+                                        bestFreshProductCounter = fpc;
+                                }
+                                else
+                                if(bestFreshProductCounter.getNrCustomers() > fpc.getNrCustomers())
+                                {
+                                    bestFreshProductCounter = fpc;
+                                }
+                        }
+                    }
+                }
+                x++;
+            }
+            
+            y++;
+        }
+        
+        return bestFreshProductCounter;
+    }
+    
+    public CashRegister findCashRegister()
     {
         
         CashRegister bestCashRegister = null;
@@ -90,87 +141,117 @@ public class Customer extends Person{
         {
             for(StoreObject soX : soY)
             {
-                if(soX != null && soX.getClass() == CashRegister.class)
+                if(soX != null && soX instanceof CashRegister)
                 {
                     CashRegister cr = (CashRegister)soX;
                     if(bestCashRegister == null) bestCashRegister = cr;
                     else
                     {
-                        if(bestCashRegister.employee != null)
-                            
-                            if(bestCashRegister.getNrCustomers() > cr.getNrCustomers()) bestCashRegister = cr;
+                        if(bestCashRegister.getNrCustomers() == cr.getNrCustomers())
+                        {
+                            if(this.distance(bestCashRegister) > this.distance(cr))
+                            {
+                                bestCashRegister = cr;
+                            }
+                        }
+                        else
+                        if(bestCashRegister.getNrCustomers() > cr.getNrCustomers()) bestCashRegister = cr;              
                     }
                 }
                 
                 x++;
             }
-            
             y++;
         }
-        this.location = bestCashRegister.location;
+        
         
         return bestCashRegister;
     }
-    
+       
     
 
     @Override
     public void update(Date simulatedDate, float deltatime) {
         super.update(simulatedDate, deltatime);
-        
-        if(simulatedDate.getTime() > nextTaskTime)//Check if its time to take a new task.
+        long cTime = simulatedDate.getTime();
+        if(cTime > nextStateUpdateTime)//Check if its time to take a new task.
         {
-            //Called every tick, update position and state
+            
             switch(currentState)
             {
-                //When in the IDLE state choose a thing to do next..
+                //When in the IDLE or LOOKING_FOR_PRODUCT state choose a thing to do next..
+                
                 case IDLE:
-                    nextTaskTime = (long) (simulatedDate.getTime() + ((40 * 1000) / this.speed)); // Takes 40 seconds to look for a shelf
-                    
-                    if(this.groceryList.size() > 0)
+                    if(this.groceryList.size() > 0) //If the customer has products to buy
                     {
-                        System.out.println(this.name + " is looking for " + this.groceryList.get(0).product.name);
-                        //Get the next item on the grocery list
-                        currentShelf = moveToShelf(this.groceryList.get(0));
-                        if(currentShelf != null)
-                            this.currentState = State.TAKING_PRODUCT;
-                        else
-                        {
-                           //Could not find product, remove it from grocerylist.
-                           //this.groceryList.remove(0); //Remove item from wished items
-                           //Stay in the idle state..
-                        }
+                        this.store.simulator.mainWindow.logMessage(this.name + " is looking for " + this.groceryList.get(0).product.name);
+                        this.currentState = State.LOOKING_FOR_PRODUCT;
+                        nextStateUpdateTime =  (cTime + (long)((10 * 1000) + this.distance(this) / this.speed)); //takes 10 seconds to look for an item..
+                        return;                       
                     }
                     else
                     {
-                      System.out.println(this.name + " is Moving to the cashregister");  
-                      //All products on the grocerylist are in the shoppingcart
-                      CashRegister register = moveToCashRegister();
+                      this.store.simulator.mainWindow.logMessage(this.name + " is Moving to the cashregister");  
+                      
+                      CashRegister register = findCashRegister();
+                      this.location = register.location;
                       register.addCustomerToLine(this);
-                      this.currentState = State.IN_LINE_CASHREGISTER;
+                      this.currentState = State.WAITING_IN_LINE;
                     }
-                    break;
+                    return;
+                case LOOKING_FOR_PRODUCT:
+                        //Get the next item on the grocery list
+                        currentShelf = findShelfContainingProduct(this.groceryList.get(0));
+                        if(currentShelf != null)
+                        {
+                            this.location = currentShelf.location;//move to the shelf
+                            this.currentState = State.TAKING_PRODUCT;
+                            
+                            nextStateUpdateTime =  (cTime + (long)(((30 + this.distance(currentShelf)) * 1000) / this.speed)); //takes 30 + 1 per unit of distance seconds to walk to, and take an item..
+                            return;
+                        }
+                        else
+                        {
+                            FreshProductCounter c = findFreshProductCounterContainingProduct(this.groceryList.get(0));
+                            if(c != null)
+                            {
+                                c.addCustomerToLine(this);
+                                this.location = c.location;
+                                this.currentState = State.WAITING_IN_LINE;
+                                return;
+                            }
+                            else
+                            {
+                                //Could not find product, remove it from grocerylist.
+                                this.groceryList.remove(0); //Remove item from wished items
+                                this.happy = false; //Customer is not happy because the store didn't have anything stocked.
+                                this.currentState = State.IDLE; //Find something to do
+                                //nextStateUpdateTime =  (cTime + (long)((20 * 1000) / this.speed)); //takes 20 seconds to not take an item.
+                            }
+                        }
+                        
+                    return;
 
                 case TAKING_PRODUCT:
-                        nextTaskTime = (long) (simulatedDate.getTime() + ((20 * 1000) / this.speed)); //takes 20 seconds to take an item..
+                        
                         if(this.groceryList.size() > 0 && currentShelf.takeItem(this.groceryList.get(0).amount))
                         {
-                            System.out.println(this.name + " is taking " + this.groceryList.get(0).product.name + " from a shelf");
+                            this.store.simulator.mainWindow.logMessage(this.name + " is taking " + this.groceryList.get(0).product.name + " from the store");
                             this.shoppingCart.add(this.groceryList.get(0));
                             this.groceryList.remove(0);
-                            this.currentState = State.IDLE;
                         }
                         else
                         {
                             //Not enough items in the shelfs..
-                            //this.groceryList.remove(0); //Remove item from wished items
-                            this.currentState = State.IDLE;
+                            this.store.simulator.mainWindow.logMessage(this.name + "can not find enough " + this.groceryList.get(0).product.name + " in the store");
                         }
-                    break;
+                        
+                        this.currentState = State.IDLE;
+                    return;
 
-                case IN_LINE_CASHREGISTER:
-                    //do nothing, wait till helped and removed from store
-                    break;
+                case WAITING_IN_LINE:
+                    //do nothing untill helped at the taskstation
+                    return;
             }
         }
     }

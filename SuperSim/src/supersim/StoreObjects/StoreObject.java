@@ -33,4 +33,13 @@ public class StoreObject {
             g.fillRect(cellWidth * location.x, cellHeight * location.y, cellWidth, cellHeight);
         }
     }
+    
+    public double distance(StoreObject o)
+    {
+        int a = o.location.x - this.location.x;
+        int b = o.location.y - this.location.y;
+        double c = Math.pow(a, 2) + Math.pow(b, 2);
+        
+        return Math.sqrt(c);
+    }
 }

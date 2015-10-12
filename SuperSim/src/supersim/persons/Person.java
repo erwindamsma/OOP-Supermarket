@@ -20,11 +20,11 @@ public class Person extends StoreObject {
     public String name;
     public float speed = 1f;
     
-    public long nextTaskTime = 0;
+    public long nextStateUpdateTime = 0;
     
-    public Point destination;
+    public boolean happy = true;
     
-    public enum State {IDLE, WALKING, WORKING_TASK, TAKING_PRODUCT, IN_LINE_CASHREGISTER};
+    public enum State {IDLE, WALKING, WORKING_TASK, TAKING_PRODUCT, WAITING_IN_LINE, LOOKING_FOR_PRODUCT};
     public State currentState;
     
     @Override
@@ -38,23 +38,6 @@ public class Person extends StoreObject {
         
     }
     
-    public void update(Date simulatedDate, float deltatime)
-    {
-        /*if(this.location != this.destination)
-        {
-            //Moving logic here
-            this.currentState = State.WALKING;
-            
-        }
-        else
-        {
-            this.currentState = State.IDLE;
-        }*/
-    }
-    
-    public void setDestination(Point dest)
-    {
-        this.destination = dest;
-    }
+    public void update(Date simulatedDate, float deltatime) {}
     
 }
