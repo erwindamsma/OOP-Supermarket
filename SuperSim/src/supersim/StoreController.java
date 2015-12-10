@@ -44,16 +44,19 @@ public class StoreController implements ITimeable{
             //create store layout
             store.layout = LayoutLoader.generateStoreLayout("storelayout1.txt", this.store);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error loading layout!");
+            JOptionPane.showMessageDialog(null, "Error loading layout!" + ex.getStackTrace().toString());
             return;
         }
         
         //add employees DEBUG
-        store.employees.add(new Employee("Employee 1", store, new Point(0,0)));
-        store.employees.add(new Employee("Employee 2", store,new Point(1,0)));
-        store.employees.add(new Employee("Employee 3", store,new Point(2,0)));
-        store.employees.add(new Employee("Employee 4", store,new Point(2,0)));
-        store.employees.get(0).speed = 0.7f;
+        store.employees.add(new Employee("Employee 1", store, store.layout.getEntrance()));
+        store.employees.add(new Employee("Employee 2", store,store.layout.getEntrance()));
+        store.employees.add(new Employee("Employee 3", store,store.layout.getEntrance()));
+        store.employees.add(new Employee("Employee 4", store,store.layout.getEntrance()));
+        store.employees.add(new Employee("Employee 5", store,store.layout.getEntrance()));
+        store.employees.get(0).speed = 1.1f;
+        store.employees.get(0).dedicatedTask = Employee.Task.FILL_SHELF; //This employee always fills shelves.
+        store.employees.get(1).dedicatedTask = Employee.Task.FILL_SHELF; //This employee always fills shelves.
 
         store.simulator.timer.addSubscriber(this); //Subscribe to the timer so onTick is called on the timer thread
         
@@ -125,7 +128,7 @@ public class StoreController implements ITimeable{
             {
                 CustomerGroup cg = this.groupLib.getRandomCustomerGroup();
                 Customer c = new Customer("Customer " + customerCount,cg, store);
-                c.location = store.layout.entrance;
+                c.location = store.layout.getEntrance();
 
                 store.customers.add(c);
                 customerCount++;

@@ -89,11 +89,11 @@ public class CustomerGroupLibrary {
             cGroup.groceryListPrototype = new ArrayList<ProductWrapper>();
             pw = new ProductWrapper();
             pw.product = store.storage.getRandomProductTypeInStore("Drank");
-            pw.amount = 2;
+            pw.amount = 1;
             cGroup.groceryListPrototype.add(pw);
             pw = new ProductWrapper();
             pw.product = store.storage.getRandomProductTypeInStore("Drank");
-            pw.amount = 2;
+            pw.amount = 1;
             cGroup.groceryListPrototype.add(pw);
             groups.add(cGroup);
         }

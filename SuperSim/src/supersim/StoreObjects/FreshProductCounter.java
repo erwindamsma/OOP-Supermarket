@@ -6,6 +6,7 @@
 package supersim.StoreObjects;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Date;
 import supersim.Product.Product;
@@ -43,6 +44,14 @@ public class FreshProductCounter extends TaskStation{
         {
             department = args[1];
         }
+    }
+    
+    @Override 
+    public void onDraw(Graphics g, int cellWidth, int cellHeight)
+    {
+      super.onDraw(g, cellWidth, cellHeight);
+      g.drawString(this.department, cellWidth * this.location.x, cellHeight * this.location.y);
+      
     }
     
     @Override

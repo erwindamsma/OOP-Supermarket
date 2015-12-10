@@ -16,6 +16,7 @@ import supersim.StoreObjects.CashRegister;
 import supersim.StoreObjects.FreshProductCounter;
 import supersim.StoreObjects.Shelf;
 import supersim.StoreObjects.StoreObject;
+import supersim.StoreObjects.TaskStation;
 
 /**
  *
@@ -33,6 +34,7 @@ public class Customer extends Person{
     float budget;//Used for buying random extra items;
     
     public Shelf currentShelf;
+    public ProductWrapper productLookingFor;
     
     public Customer(String name, CustomerGroup group, Store store)
     {
@@ -54,34 +56,32 @@ public class Customer extends Person{
         this.hasLeftStore = true;
     }
     
-    public Shelf findShelfContainingProduct(ProductWrapper productwrapper)
+    
+    public Shelf findNearestShelfContainingProductFromGroceryList()
     {
-        int x = 0, y = 0;
-        
         Shelf bestShelf = null;
-        
-        for(StoreObject[] soY : store.layout.matrix)
-        {
-            for(StoreObject soX : soY)
-            {
-                
-                if(soX != null && soX instanceof Shelf)
-                {
-                    Shelf s = (Shelf)soX;
 
-                    if(s.getAmountOfItemsInShelf() > 0 && s.getProduct().id == productwrapper.product.id)
+        for(Shelf s : store.layout.getShelves())
+        {
+            if(s.getAmountOfItemsInShelf() > 0)
+            {
+                for(ProductWrapper pw : this.groceryList)
+                {
+                    if(s.getProduct().id == pw.product.id)
                     {
                         if(bestShelf == null) bestShelf = s;
                         else
                         {
-                            if(this.distance(bestShelf) > this.distance(s)) bestShelf = s;
+                            if(this.distance(bestShelf) > this.distance(s)) 
+                            {
+                                productLookingFor = pw;
+                                bestShelf = s;
+                            }
                         }
                     }
                 }
-                x++;
+                
             }
-            
-            y++;
         }
         
         return bestShelf;
@@ -89,43 +89,31 @@ public class Customer extends Person{
     
     public FreshProductCounter findFreshProductCounterContainingProduct(ProductWrapper productwrapper)
     {
-        
         FreshProductCounter bestFreshProductCounter = null;
-        
-        int x = 0, y = 0;
-        for(StoreObject[] soY : store.layout.matrix)
+
+        for(TaskStation soX : store.layout.getTaskstations())
         {
-            for(StoreObject soX : soY)
+            if(soX != null && soX instanceof FreshProductCounter)
             {
-                
-                if(soX != null && soX instanceof FreshProductCounter)
+                FreshProductCounter fpc = (FreshProductCounter)soX;
+                if(productwrapper.product.department.equalsIgnoreCase(fpc.department))
                 {
-                    FreshProductCounter fpc = (FreshProductCounter)soX;
-                    if(productwrapper.product.department.equalsIgnoreCase(fpc.department))
+                    if(bestFreshProductCounter == null) bestFreshProductCounter = fpc;
+                    else
                     {
-                        if(bestFreshProductCounter == null) bestFreshProductCounter = fpc;
-                        else
+                        if(bestFreshProductCounter.getNrCustomers() == fpc.getNrCustomers() || fpc.getNrCustomers() < 8)
                         {
-                            //if(bestCashRegister.employee != null)
-                            
-                            
-                                if(bestFreshProductCounter.getNrCustomers() == fpc.getNrCustomers())
-                                {
-                                    if(this.distance(bestFreshProductCounter) > this.distance(fpc))
-                                        bestFreshProductCounter = fpc;
-                                }
-                                else
-                                if(bestFreshProductCounter.getNrCustomers() > fpc.getNrCustomers())
-                                {
-                                    bestFreshProductCounter = fpc;
-                                }
+                            if(this.distance(bestFreshProductCounter) > this.distance(fpc))
+                                bestFreshProductCounter = fpc;
+                        }
+                        else
+                        if(bestFreshProductCounter.getNrCustomers() > fpc.getNrCustomers())
+                        {
+                            bestFreshProductCounter = fpc;
                         }
                     }
                 }
-                x++;
             }
-            
-            y++;
         }
         
         return bestFreshProductCounter;
@@ -135,19 +123,16 @@ public class Customer extends Person{
     {
         
         CashRegister bestCashRegister = null;
-        
-        int x = 0, y = 0;
-        for(StoreObject[] soY : store.layout.matrix)
+
+        for(TaskStation soX : store.layout.getTaskstations())
         {
-            for(StoreObject soX : soY)
-            {
                 if(soX != null && soX instanceof CashRegister)
                 {
                     CashRegister cr = (CashRegister)soX;
                     if(bestCashRegister == null) bestCashRegister = cr;
                     else
                     {
-                        if(bestCashRegister.getNrCustomers() == cr.getNrCustomers())
+                        if(bestCashRegister.getNrCustomers() == cr.getNrCustomers() || bestCashRegister.getNrCustomers() < 8)
                         {
                             if(this.distance(bestCashRegister) > this.distance(cr))
                             {
@@ -158,10 +143,6 @@ public class Customer extends Person{
                         if(bestCashRegister.getNrCustomers() > cr.getNrCustomers()) bestCashRegister = cr;              
                     }
                 }
-                
-                x++;
-            }
-            y++;
         }
         
         
@@ -184,7 +165,7 @@ public class Customer extends Person{
                 case IDLE:
                     if(this.groceryList.size() > 0) //If the customer has products to buy
                     {
-                        this.store.simulator.mainWindow.logMessage(this.name + " is looking for " + this.groceryList.get(0).product.name);
+                        this.store.simulator.mainWindow.logMessage(this.name + " is looking for a new shelf");
                         this.currentState = State.LOOKING_FOR_PRODUCT;
                         nextStateUpdateTime =  (cTime + (long)((10 * 1000) + this.distance(this) / this.speed)); //takes 10 seconds to look for an item..
                         return;                       
@@ -194,14 +175,18 @@ public class Customer extends Person{
                       this.store.simulator.mainWindow.logMessage(this.name + " is Moving to the cashregister");  
                       
                       CashRegister register = findCashRegister();
-                      this.location = register.location;
-                      register.addCustomerToLine(this);
-                      this.currentState = State.WAITING_IN_LINE;
+                      if(register != null)
+                      {
+                        this.location = register.location;
+                        register.addCustomerToLine(this);
+                        this.currentState = State.WAITING_IN_LINE;
+                      }
+                      
                     }
                     return;
                 case LOOKING_FOR_PRODUCT:
                         //Get the next item on the grocery list
-                        currentShelf = findShelfContainingProduct(this.groceryList.get(0));
+                        currentShelf = findNearestShelfContainingProductFromGroceryList();
                         if(currentShelf != null)
                         {
                             this.location = currentShelf.location;//move to the shelf
@@ -234,16 +219,19 @@ public class Customer extends Person{
 
                 case TAKING_PRODUCT:
                         
-                        if(this.groceryList.size() > 0 && currentShelf.takeItem(this.groceryList.get(0).amount))
+                        if(productLookingFor != null && this.groceryList.size() > 0 && currentShelf.takeItem(productLookingFor.amount))
                         {
-                            this.store.simulator.mainWindow.logMessage(this.name + " is taking " + this.groceryList.get(0).product.name + " from the store");
-                            this.shoppingCart.add(this.groceryList.get(0));
+                            this.store.simulator.mainWindow.logMessage(this.name + " is taking " + productLookingFor.product.name + " from the store");
+                            this.shoppingCart.add(productLookingFor);
                             this.groceryList.remove(0);
                         }
                         else
                         {
-                            //Not enough items in the shelfs..
-                            this.store.simulator.mainWindow.logMessage(this.name + "can not find enough " + this.groceryList.get(0).product.name + " in the store");
+                            if(productLookingFor != null)
+                            {
+                                //Not enough items in the shelfs..
+                                this.store.simulator.mainWindow.logMessage(this.name + "can not find enough " + productLookingFor.product.name + " in the store");
+                            }
                         }
                         
                         this.currentState = State.IDLE;

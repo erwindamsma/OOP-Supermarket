@@ -38,7 +38,7 @@ public class LayoutLoader {
         if(matrixSize == -1) return null;
             
         StoreLayout retVal = new StoreLayout(store);
-        StoreObject[][] matrix = new StoreObject[matrixSize][matrixSize];
+        retVal.SIZE = matrixSize;
         
         int x = 0, y = 0;
         while ((line = br.readLine()) != null)  
@@ -57,24 +57,24 @@ public class LayoutLoader {
                     case "shelf":
                         Shelf newShelf = new Shelf(args, store);
                         newShelf.location = new Point(x,y);
-                        matrix[y][x] = newShelf;
+                        retVal.getShelves().add(newShelf);
                         
                         break;
                         
                     case "cashregister":
                         CashRegister newCashRegister = new CashRegister(args, store);
                         newCashRegister.location = new Point(x,y);
-                        matrix[y][x] = newCashRegister;
+                        retVal.getTaskstations().add(newCashRegister);
                         break;
                         
                     case "freshproductcounter":
                         FreshProductCounter newFreshProductCounter = new FreshProductCounter(args, store);
                         newFreshProductCounter.location = new Point(x,y);
-                        matrix[y][x] = newFreshProductCounter;
+                        retVal.getTaskstations().add(newFreshProductCounter);
                         break;
                         
                     case "entrance":
-                        retVal.entrance = new Point(x,y);
+                        retVal.setEntrance(new Point(x,y));
                         break;
                         
                 }
@@ -84,9 +84,7 @@ public class LayoutLoader {
             x = 0;
             y++;
         } 
-        
-        retVal.matrix = matrix;
-        retVal.SIZE   = matrixSize;
+
         return retVal;
     }
 }

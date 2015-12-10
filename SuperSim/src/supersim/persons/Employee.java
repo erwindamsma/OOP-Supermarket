@@ -10,9 +10,8 @@ import java.awt.Point;
 import java.util.Date;
 import supersim.Product.ProductWrapper;
 import supersim.Store;
-import supersim.StoreObjects.CashRegister;
+import supersim.StoreObjects.FreshProductCounter;
 import supersim.StoreObjects.Shelf;
-import supersim.StoreObjects.StoreObject;
 import supersim.StoreObjects.TaskStation;
 
 /**
@@ -24,6 +23,8 @@ public class Employee extends Person{
     public enum Task {NONE, FILL_SHELF, TASK_STATION, HELPING_CUSTOMER};
 
     public Task currentTask;
+    
+    public Task dedicatedTask = null;
     
     
     //State currentState;
@@ -45,28 +46,20 @@ public class Employee extends Person{
     {
         Shelf bestShelf = null;
         
-        for(StoreObject[] soY : store.layout.matrix)
+        for(Shelf s : store.layout.getShelves())
         {
-            for(StoreObject soX : soY)
+            int itemsinshelf = s.getAmountOfItemsInShelf();
+            if(itemsinshelf < s.SIZE && store.storage.amountInStorage(s.getProduct()) != 0 && !s.beingFilled)
             {
-                if(soX != null && soX instanceof Shelf)
+                if(bestShelf == null) bestShelf = s;
+                else
                 {
-                    Shelf s = (Shelf)soX;
-                    int itemsinshelf = s.getAmountOfItemsInShelf();
-                    if(itemsinshelf < s.SIZE && store.storage.amountInStorage(s.getProduct()) != 0 && !s.beingFilled)
+                    if(this.distance(bestShelf) > this.distance(s))
                     {
-                        if(bestShelf == null) bestShelf = s;
-                        else
-                        {
-                            if(this.distance(bestShelf) > this.distance(s))
-                            {
-                                bestShelf = s;
-                            }
-                        }
+                        bestShelf = s;
                     }
-                        
                 }
-            }
+            } 
         }
         
         return bestShelf;
@@ -85,66 +78,25 @@ public class Employee extends Person{
            shelf.putItem(itemsTaken);
        }
     }
-    
-    public TaskStation unmannedTaskStationWithLine()
-    {
-        TaskStation bestTs = null;
-        
-        for(StoreObject[] soY : store.layout.matrix)
-        {
-            for(StoreObject soX : soY)
-            {
-                if(soX != null && soX instanceof TaskStation)
-                {
-                    TaskStation ts = (TaskStation)soX;
-                    
-                    if(ts.employee == null && ts.getNrCustomers() > 0)
-                    {
-                       if(bestTs == null) bestTs = ts;
-                       else
-                       {
-                           if(this.distance(bestTs) > this.distance(ts))
-                           {
-                               bestTs = ts;
-                           }
-                       }
-                        
-                    }
-                        
-                }
-            }
-        }
-         
-         return bestTs;
-    }
-    
+      
     
     public TaskStation findUnmanedTaskStationWithLine()
     {
         TaskStation bestTs = null;
         
-        for(StoreObject[] soY : store.layout.matrix)
+        for(TaskStation ts : store.layout.getTaskstations())
         {
-            for(StoreObject soX : soY)
+            if(ts.employee == null && ts.getNrCustomers() > 0)
             {
-                if(soX != null && soX instanceof TaskStation)
-                {
-                    TaskStation ts = (TaskStation)soX;
-                    
-                    if(ts.employee == null && ts.getNrCustomers() > 0)
-                    {
-                        if(bestTs == null) bestTs = ts;
-                       else
-                       {
-                           if(this.distance(bestTs) > this.distance(ts))
-                           {
-                               bestTs = ts;
-                           }
-                       }
-                    }
-                        
-                }
-            }
+                if(bestTs == null) bestTs = ts;
+               else
+               {
+                   if(this.distance(bestTs) > this.distance(ts))
+                   {
+                       bestTs = ts;
+                   }
+               }
+            }   
         }
         
         return bestTs;
@@ -154,24 +106,60 @@ public class Employee extends Person{
     {
         int retval = 0;
         
-        for(StoreObject[] soY : store.layout.matrix)
+        for(TaskStation ts : store.layout.getTaskstations())
         {
-            for(StoreObject soX : soY)
+            if(ts.employee != null)
             {
-                if(soX != null && soX instanceof TaskStation)
-                {
-                    TaskStation ts = (TaskStation)soX;
-                    
-                    if(ts.employee != null)
-                    {
-                        retval++;
-                    }
-                        
-                }
+                retval++;
             }
         }
         
         return retval;
+    }
+    
+    public TaskStation findMannedTaskStationWithType(Class c)
+    {
+         TaskStation bestTs = null;
+        
+        for(TaskStation ts : store.layout.getTaskstations())
+        {
+            if(ts.employee != null && c.isInstance(ts))
+            {
+               if(bestTs == null) bestTs = ts;
+               else
+               {
+                   if(this.distance(bestTs) > this.distance(ts))
+                   {
+                       bestTs = ts;
+                   }
+               }
+            }
+        }
+        
+        return bestTs;
+    }
+    
+    //find an empty task station with the given type
+    public TaskStation findEmptyTaskStationWithType(Class c)
+    {
+        TaskStation bestTs = null;
+        
+        for(TaskStation ts : store.layout.getTaskstations())
+        {
+            if(ts.employee == null && c.isInstance(ts))
+            {
+               if(bestTs == null) bestTs = ts;
+               else
+               {
+                   if(this.distance(bestTs) > this.distance(ts))
+                   {
+                       bestTs = ts;
+                   }
+               }
+            }
+        }
+        
+        return bestTs;
     }
 
     public Shelf assignedShelf;
@@ -184,14 +172,29 @@ public class Employee extends Person{
        
                 if(cTime > nextStateUpdateTime)//Check if its time to advance the state.
                 {
+                    if(dedicatedTask != null) this.currentTask = dedicatedTask;
+                    
                     switch(currentTask)
                     {
                         case NONE://Find this employee something to do
-                            this.location = new Point(10,10);
-                            //When there is an empty taskstation with more than 1 people in line, man an unmanned taskstation.
-                            //Check this first because it has a high priority
-                            TaskStation ts = findUnmanedTaskStationWithLine();
-                            if(ts != null) //If such a taskstation has been found
+                            //this.location = new Point(10,10);
+
+                            
+                            TaskStation ts = null;
+                                
+                            
+                            ts = findUnmanedTaskStationWithLine();
+                            if(ts == null) //If such a taskstation has not been found
+                            {
+                                //Check if a new taskstation should be openend
+                                for(TaskStation nTs : this.store.layout.getTaskstations())
+                                {
+                                    if(nTs.getNrCustomers() > 5)//If more than 5 people are in line
+                                        ts = findEmptyTaskStationWithType(nTs.getClass());
+                                }
+                            }
+                            
+                            if(ts != null) //If a taskstation has been found
                             {
                                 manTaskStation(ts); //Assign the employee to the taskstation
                                 this.currentTask = Task.TASK_STATION;
@@ -243,16 +246,11 @@ public class Employee extends Person{
                             else 
                             {
                                 this.store.simulator.mainWindow.logMessage(this.name + " is helping the next customer in line (" + this.currentTaskStation.getNrCustomers() + " people in line)");
-                                this.currentTask = Task.HELPING_CUSTOMER;
+                                this.currentTaskStation.CheckTask(simulatedDate); //Help the next customer in line
                             }
                             
                            
                             this.nextStateUpdateTime = (cTime + (long)((this.currentTaskStation.taskTime / this.speed) * 1000));//Takes 'taskTime' seconds to help a customer
-                            return;
-                            
-                        case HELPING_CUSTOMER:
-                            this.currentTaskStation.CheckTask(simulatedDate); //Help the next customer in line
-                            this.currentTask = Task.TASK_STATION;
                             return;
                     }
                 }

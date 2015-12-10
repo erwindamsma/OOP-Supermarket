@@ -196,6 +196,8 @@ public class MainWindow extends javax.swing.JFrame implements ITimeable {
         jSplitPane1.setDividerLocation(250);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
+        storeRenderer1.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+
         speedSlider.setMaximum(3000);
         speedSlider.setMinimum(1);
         speedSlider.setValue(1);
@@ -228,6 +230,7 @@ public class MainWindow extends javax.swing.JFrame implements ITimeable {
 
         jLabel1.setText("Employees");
 
+        employeeList.setAutoCreateRowSorter(true);
         employeeList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -272,6 +275,7 @@ public class MainWindow extends javax.swing.JFrame implements ITimeable {
 
         jLabel2.setText("Customers");
 
+        customerList.setAutoCreateRowSorter(true);
         customerList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -306,6 +310,7 @@ public class MainWindow extends javax.swing.JFrame implements ITimeable {
 
         jSplitPane2.setRightComponent(jSplitPane3);
 
+        storageTable.setAutoCreateRowSorter(true);
         storageTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

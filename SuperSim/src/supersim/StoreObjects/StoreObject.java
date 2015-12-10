@@ -21,10 +21,7 @@ public class StoreObject {
     public Image bitmap;
     public Store store;
         
-    public void onDraw(Graphics g, int panelWidth, int panelHeight){
-        int cellWidth = panelWidth / store.layout.SIZE;
-        int cellHeight = panelHeight / store.layout.SIZE;
-        
+    public void onDraw(Graphics g, int cellWidth, int cellHeight){
         if (bitmap != null){
             g.drawImage(bitmap, cellWidth * location.x, cellHeight * location.y, null);
         }

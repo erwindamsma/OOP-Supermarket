@@ -1,9 +1,9 @@
 #size:20
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,FreshProductCounter:Kaas,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,Shelf:Zuivel,Shelf:Zuivel,Shelf:Zuivel,Shelf:Zuivel,0,0
-0,0,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,0,0,0,0,0,0
-FreshProductCounter:Bakkerij,0,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,0,0,0,0,0,0
-FreshProductCounter:Bakkerij,0,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,0,0,0,Shelf:Frisdrank,0,0
+0,FreshProductCounter:Kaas,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,Shelf:Zuivel,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,Shelf:Zuivel,0,0,0,0,0
+FreshProductCounter:Bakkerij,0,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,Shelf:Zuivel,0,0,0,0,0
+FreshProductCounter:Bakkerij,0,0,0,0,0,0,0,0,Shelf:Fruit,0,0,0,0,Shelf:Zuivel,0,0,Shelf:Frisdrank,0,0
 FreshProductCounter:Bakkerij,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Shelf:Frisdrank,0,0
 FreshProductCounter:Bakkerij,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Shelf:Frisdrank,0,0
 Shelf:Vlees,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -18,4 +18,4 @@ Shelf:Drank,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Shelf:Groente,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Shelf:Groente,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Shelf:Groente,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Shelf:Groente,0,0
-cashregister,0,cashregister,0,0,cashregister,0,0,0,0,0,0,0,0,0,0,0,0,0,ENTRANCE
+cashregister,0,cashregister,0,cashregister,0,cashregister,0,cashregister,0,0,0,0,cashregister,0,cashregister,0,0,0,ENTRANCE

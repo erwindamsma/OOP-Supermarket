@@ -88,11 +88,10 @@ public class Shelf extends StoreObject{
     }
     
     @Override
-    public void onDraw(Graphics g, int panelWidth, int panelHeight)
+    public void onDraw(Graphics g, int cellWidth, int cellHeight)
     {
-        super.onDraw(g, panelWidth, panelHeight);
-        int cellWidth = panelWidth / store.layout.SIZE;
-        int cellHeight = panelHeight / store.layout.SIZE;
+        super.onDraw(g, cellWidth, cellHeight);
+       
         g.setColor(Color.BLACK);
         g.drawString(this.product.product.name + " ("+this.product.amount+"/"+this.SIZE+")", this.location.x * cellWidth + cellWidth, this.location.y * cellHeight+ 20);
         

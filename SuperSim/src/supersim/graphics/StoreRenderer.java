@@ -48,7 +48,7 @@ public class StoreRenderer extends JPanel implements ITimeable {
     }
     
     @Override protected void paintComponent(Graphics g){
-        if(superSim == null)
+        if(superSim == null || superSim.store.layout == null)
         {
             g.drawString("No Simulator has been assigned..", 10, 10);
             return;
@@ -59,33 +59,34 @@ public class StoreRenderer extends JPanel implements ITimeable {
         g.clearRect(0, 0, this.getWidth(), this.getHeight());
         if(superSim.store != null && superSim.store.layout != null)
         {
-            int x = 0;int  y = 0;
-            for (StoreObject[] soY : superSim.store.layout.matrix)
+            int cellWidth = this.getWidth() / superSim.store.layout.SIZE;
+            int cellHeight = this.getHeight() / superSim.store.layout.SIZE;
+            
+            for (StoreObject so : superSim.store.layout.getShelves())
             {
-                for (StoreObject soX : soY){
-                    if(soX != null)
-                    {
-                        //g.drawImage(this.superSim.store.layout.floorImage,x,y,this.getWidth() / superSim.store.layout.SIZE,this.getHeight() / superSim.store.layout.SIZE,null);
-                        soX.onDraw(g, this.getWidth(), this.getHeight());
-                    }
-                    x++;
-                }
-                x = 0;
-                y++;
+                //g.drawImage(this.superSim.store.layout.floorImage,x,y,this.getWidth() / superSim.store.layout.SIZE,this.getHeight() / superSim.store.layout.SIZE,null);
+                so.onDraw(g, cellWidth, cellHeight);
+            }
+            
+            for (StoreObject so : superSim.store.layout.getTaskstations())
+            {
+                //g.drawImage(this.superSim.store.layout.floorImage,x,y,this.getWidth() / superSim.store.layout.SIZE,this.getHeight() / superSim.store.layout.SIZE,null);
+                so.onDraw(g, cellWidth, cellHeight);
             }
             
             
             //Draw the employees
             for(Employee e : superSim.store.employees)
             {
-                e.onDraw(g, this.getWidth(), this.getHeight());
+                e.onDraw(g, cellWidth, cellHeight);
             }
             
              //Draw the Customers
             List<Customer> custCopy = new ArrayList<>(superSim.store.customers);
             for(Customer c : custCopy)
             {
-                c.onDraw(g, this.getWidth(), this.getHeight());
+                if(c != null)
+                    c.onDraw(g, cellWidth, cellHeight);
             }
         }
         
